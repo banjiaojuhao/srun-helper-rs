@@ -16,6 +16,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: "juankaram/rust-musl-action@master"
+    - uses: juankaram/rust-musl-action@master
       with:
-        - args: "cargo build --target x86_64-unknown-linux-musl --release"
+        - args: cargo build --target x86_64-unknown-linux-musl --release
