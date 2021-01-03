@@ -16,6 +16,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: juankaram/rust-musl-action@master
-        with:
+      - name: Rust MUSL Builder
+        uses: NSCoder/rust-musl-action@v1.0.0
           args: cargo build --target x86_64-unknown-linux-musl --release
