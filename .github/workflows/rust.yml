@@ -19,7 +19,3 @@ jobs:
     - uses: "juankaram/rust-musl-action@master"
       with:
         - args: "cargo build --target x86_64-unknown-linux-musl --release"
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
