@@ -1,0 +1,18 @@
+language: rust
+sudo: required
+os:
+  - linux
+rust:
+  - stable
+services:
+  - docker
+before_deploy: "./build-release srun-helper-rs ${TRAVIS_TAG}-${TRAVIS_OS_NAME}"
+deploy:
+  provider: releases
+  api_key: ${api_key}
+  file_glob: true
+  file: "srun-helper-rs-${TRAVIS_TAG}-${TRAVIS_OS_NAME}.*"
+  skip_cleanup: true
+  on:
+    rust: stable
+    tags: true
