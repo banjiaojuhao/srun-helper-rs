@@ -11,6 +11,8 @@ use serde_json::Value;
 use sha1::Sha1;
 
 use crate::encrypt::x_encode_str;
+use std::net::IpAddr;
+use std::str::FromStr;
 
 mod encrypt;
 
@@ -25,8 +27,8 @@ const CHALLENGE_URL: &str = "http://10.248.98.2/cgi-bin/get_challenge";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        println!("invalid args. (only \"login\" or \"logout\")");
+    if args.len() < 2 {
+        println!("usage: srun-helper-rs login [local address]");
         return;
     };
     let action = args[1].as_str();
@@ -47,7 +49,15 @@ fn main() {
         password: user[1].trim().to_owned(),
     };
 
-    let web_client = reqwest::blocking::Client::new();
+    let web_client = if args.len() > 2 {
+        let local_address = args[2].as_str();
+        reqwest::blocking::Client::builder()
+            .local_address(IpAddr::from_str(local_address).unwrap())
+            .build()
+            .unwrap()
+    } else {
+        reqwest::blocking::Client::new()
+    };
 
     let result = match action {
         "login" => {
