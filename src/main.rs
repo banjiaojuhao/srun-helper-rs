@@ -2,8 +2,10 @@ use std::collections::HashMap;
 use std::env;
 use std::fs::File;
 use std::io::Read;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::net::IpAddr;
+use std::str::FromStr;
 
+use chrono::Utc;
 use hex;
 use md5::Digest;
 use reqwest::blocking::Client;
@@ -11,8 +13,6 @@ use serde_json::Value;
 use sha1::Sha1;
 
 use crate::encrypt::x_encode_str;
-use std::net::IpAddr;
-use std::str::FromStr;
 
 mod encrypt;
 
@@ -163,12 +163,7 @@ fn logout(web_client: &Client, user: &User) -> Value {
 }
 
 fn get_callback() -> String {
-    let start = SystemTime::now();
-    let since_the_epoch = start
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards");
-
-    return format!("jsonp{}", since_the_epoch.as_millis());
+    return format!("jsonp{}", Utc::now().timestamp_millis());
 }
 
 fn get_challenge(web_client: &Client, user: &User, callback: &str) -> Value {
