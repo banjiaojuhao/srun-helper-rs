@@ -12,6 +12,7 @@ edition = "2018"
 vendored-openssl = ["openssl-sys/vendored"]
 
 [dependencies]
+argh = "0.1"
 serde_json = "1.0"
 chrono = "0.4"
 openssl-sys = { version = "0.9", features = ['vendored'] }
