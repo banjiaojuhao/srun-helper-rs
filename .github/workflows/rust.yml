@@ -32,11 +32,17 @@ jobs:
         run: |
           cargo build --release --target=x86_64-unknown-linux-musl
 
+      - name: Strip and Compress
+        id: compress
+        run: |
+          strip target/x86_64-unknown-linux-musl/release/srun-helper-rs
+          tar -czf srun-helper-rs.tar.gz target/x86_64-unknown-linux-musl/release/srun-helper-rs
+
       - name: Upload bin directory
         uses: actions/upload-artifact@v2
         with:
-          name: srun-helper-rs
-          path: target/x86_64-unknown-linux-musl/release/srun-helper-rs
+          name: srun-helper-rs.tar.gz
+          path: srun-helper-rs.tar.gz
 
       - name: Generate release tag
         id: tag
@@ -51,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: target/x86_64-unknown-linux-musl/release/srun-helper-rs
+          files: srun-helper-rs.tar.gz
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
