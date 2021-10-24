@@ -21,7 +21,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt update
-          sudo apt install -y build-essential libssl-dev
+          sudo apt install -y build-essential libssl-dev musl-dev musl-tools
           sudo apt autoremove --purge -y
           sudo apt clean
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
