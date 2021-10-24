@@ -11,15 +11,46 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - id: 'compile'
-        uses: heroku/rust-cargo-musl-action@v1
-        with:
-          command: 'build'
-          flags: '--features vendored-openssl'
-      - uses: actions/upload-artifact@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+          rustup target add x86_64-unknown-linux-musl
+
+      - name: Compile
+        id: compile
+        run: |
+          cargo build --release --target=x86_64-unknown-linux-musl
+
+      - name: Upload bin directory
+        uses: actions/upload-artifact@v2
         with:
           name: srun-helper-rs
-          path: ${{ steps.compile.outputs.release-dir }}/srun-helper-rs
+          path: target/x86_64-unknown-linux-musl/release/srun-helper-rs
+
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::$(date +"%Y%m%d%H%M")"
+          echo "::set-output name=status::success"
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        if: steps.tag.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          files: target/x86_64-unknown-linux-musl/release/srun-helper-rs
+
+      - name: Delete workflow runs
+        uses: GitRML/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 3
