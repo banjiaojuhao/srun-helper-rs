@@ -67,11 +67,19 @@ fn main() {
 
     let result = match log_info.action {
         Action::Login(login_config) => {
-            let web_client = get_web_client(&login_config.interface);
+            let web_client = if let Some(address) = login_config.interface {
+                get_web_client(Some(&address))
+            } else {
+                get_web_client(None)
+            };
             login(&web_client, &login_config.username, &login_config.password)
         }
         Action::Logout(logout_config) => {
-            let web_client = get_web_client(&logout_config.interface);
+            let web_client = if let Some(address) = logout_config.interface {
+                get_web_client(Some(&address))
+            } else {
+                get_web_client(None)
+            };
             logout(&web_client, &logout_config.username)
         }
     };
@@ -165,14 +173,14 @@ fn logout(web_client: &Client, username: &str) -> Value {
     return result;
 }
 
-fn get_web_client(interface_config: &Option<String>) -> Client {
+fn get_web_client(interface_config: Option<&str>) -> Client {
     match interface_config {
         None => {
             reqwest::blocking::Client::new()
         }
         Some(local_address) => {
             reqwest::blocking::Client::builder()
-                .local_address(IpAddr::from_str(&local_address).unwrap())
+                .local_address(IpAddr::from_str(local_address).unwrap())
                 .build()
                 .unwrap()
         }
